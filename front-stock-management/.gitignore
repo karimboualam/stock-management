@@ -26,15 +26,11 @@ yarn-error.log
 !.vscode/extensions.json
 .history/*
 
-# Angular cache
-/.angular/cache
-.angular/cache
-
-# Environment files
-src/environments/*.ts
-!src/environments/environment.prod.ts
+# IntelliJ IDEA
+*.iml
 
 # Miscellaneous
+/.angular/cache
 .sass-cache/
 /connect.lock
 /coverage
@@ -42,23 +38,28 @@ src/environments/*.ts
 testem.log
 /typings
 
-# Logs
-*.log
-*.gz
-
-# Test coverage
-/coverage
-/lcov-report/
-
-# Babel/Webpack
-.eslintcache
-.babelrc
-.cache/
-.webpack/
-
-# Prettier
-.prettiercache
-
 # System files
 .DS_Store
 Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Environment variables
+.env
+
+# Docker & Kubernetes config
+docker-compose.override.yml
+
+# npm & yarn cache
+.npm/
+.yarn/
+.yarn-cache/
+
+# macOS Finder directory settings
+.DS_Store
+
+# Windows system files
+Thumbs.db
+Desktop.ini
