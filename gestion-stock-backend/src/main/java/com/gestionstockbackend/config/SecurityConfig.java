@@ -8,9 +8,12 @@
     import org.springframework.security.crypto.password.PasswordEncoder;
     import org.springframework.security.web.SecurityFilterChain;
     import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+    import org.springframework.web.servlet.config.annotation.CorsRegistry;
+    import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
 
     @Configuration
-    public class SecurityConfig {
+    public class SecurityConfig  implements WebMvcConfigurer {
 
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -30,6 +33,15 @@
                             .anyRequest().authenticated() // Les autres requêtes nécessitent une authentification
                     );
             return http.build();
+        }
+
+        @Override
+        public void addCorsMappings(CorsRegistry registry) {
+            registry.addMapping("/**")
+                    .allowedOrigins("http://localhost:4200")  // Autoriser l'origine de votre frontend Angular
+                    .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")  // Autoriser les méthodes HTTP
+                    .allowedHeaders("*")  // Autoriser tous les headers
+                    .allowCredentials(true);  // Permet les cookies si nécessaire
         }
 
         @Bean
