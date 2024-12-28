@@ -12,9 +12,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
+
     @Autowired
     private UtilisateurRepository utilisateurRepository;
 
@@ -25,29 +28,57 @@ public class AuthController {
     private JwtService jwtService;
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody Utilisateur utilisateur) {
+    public ResponseEntity<String> register(@RequestBody Map<String, String> payload) {
 
-        // Check if the email already exists in the database
-        if (utilisateurRepository.findByEmail(utilisateur.getEmail()).isPresent()) {
-            // Return a BAD_REQUEST with an appropriate message
+        // Vérifier si l'email existe déjà dans la base de données
+        if (utilisateurRepository.findByEmail(payload.get("email")).isPresent()) {
             return new ResponseEntity<>("Email already exists", HttpStatus.BAD_REQUEST);
         }
 
-        // Encode the password and save the new user
-        utilisateur.setPassword(passwordEncoder.encode(utilisateur.getPassword()));
+        // Vérifier la correspondance entre password et confirmPassword
+        if (!payload.get("password").equals(payload.get("confirmPassword"))) {
+            return new ResponseEntity<>("Passwords do not match", HttpStatus.BAD_REQUEST);
+        }
+
+        // Créer un nouvel utilisateur
+        Utilisateur utilisateur = new Utilisateur();
+        utilisateur.setEmail(payload.get("email"));  // L'email est pris tel quel sans validation
+        utilisateur.setPassword(passwordEncoder.encode(payload.get("password")));
+        utilisateur.setRole(payload.get("role"));
+        utilisateur.setFirstName(payload.get("firstName"));
+        utilisateur.setLastName(payload.get("lastName"));
+        utilisateur.setGender(payload.get("gender"));
+        utilisateur.setPasswordVerified(true);  // Marquer le mot de passe comme confirmé
+
+        // Enregistrer l'utilisateur
         utilisateurRepository.save(utilisateur);
 
-        // Return a successful response with CREATED status
+        // Retourner une réponse de succès
         return new ResponseEntity<>("Utilisateur enregistré avec succès.", HttpStatus.CREATED);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody Utilisateur utilisateur) {
-        Utilisateur user = utilisateurRepository.findByEmail(utilisateur.getEmail())
+   // public ResponseEntity<String> login(@RequestBody Utilisateur utilisateur) {
+        public ResponseEntity<Map<String, Object>> login(@RequestBody Utilisateur utilisateur) {
+
+            Utilisateur user = utilisateurRepository.findByEmail(utilisateur.getEmail())
                 .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
 
         if (passwordEncoder.matches(utilisateur.getPassword(), user.getPassword())) {
-            return ResponseEntity.ok(jwtService.generateToken(user.getEmail()));
+            // Retourner le token JWT
+          //  return ResponseEntity.ok(jwtService.generateToken(user.getEmail()));
+            // Générer le token JWT avec firstName et lastName
+            String token = jwtService.generateToken(user);
+            // Construire la réponse avec le token, firstName et lastName
+
+
+            Map<String, Object> response = Map.of(
+                    "token", token,
+                    "firstName", user.getFirstName(),
+                    "lastName", user.getLastName()
+            );
+
+            return ResponseEntity.ok(response);
         } else {
             throw new RuntimeException("Mot de passe incorrect");
         }

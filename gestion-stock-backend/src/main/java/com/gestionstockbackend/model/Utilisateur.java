@@ -1,12 +1,10 @@
 package com.gestionstockbackend.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
-//@Data
+@Data
 @Entity
 public class Utilisateur {
 
@@ -14,12 +12,32 @@ public class Utilisateur {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "L'email est obligatoire")
     private String email;
+
+    @NotBlank(message = "Le mot de passe est obligatoire")
     private String password;
+
+    @NotBlank(message = "Le rôle est obligatoire")
     private String role;
 
-// Getters & setters
+    @NotBlank(message = "Le nom est obligatoire")
+    private String lastName; // Nom
 
+    @NotBlank(message = "Le prénom est obligatoire")
+    private String firstName; // Prénom
+
+    @NotBlank(message = "Le sexe est obligatoire")
+    @Column(nullable = false, length = 255)
+    private String gender = "unknown"; // Valeur par défaut pour éviter les conflits
+
+    // Suppression de l'attribut isEmailVerified
+    // private boolean isEmailVerified = false;
+
+    // Ajout de l'attribut isPasswordVerified
+    private boolean isPasswordVerified = false; // Indicateur pour vérifier si le mot de passe est confirmé
+
+    // Getters & setters
 
     public Long getId() {
         return id;
@@ -53,18 +71,51 @@ public class Utilisateur {
         this.role = role;
     }
 
-
-    // constructeurs
-
-    public Utilisateur() {
-
+    public String getLastName() {
+        return lastName;
     }
 
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
 
-    public Utilisateur(Long id, String email, String password, String role) {
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public boolean isPasswordVerified() {
+        return isPasswordVerified;
+    }
+
+    public void setPasswordVerified(boolean passwordVerified) {
+        isPasswordVerified = passwordVerified;
+    }
+
+    // Constructeurs
+
+    public Utilisateur() {
+    }
+
+    public Utilisateur(Long id, String email, String password, String role, String lastName, String firstName, String gender, boolean isPasswordVerified) {
         this.id = id;
         this.email = email;
         this.password = password;
         this.role = role;
+        this.lastName = lastName;
+        this.firstName = firstName;
+        this.gender = gender;
+        this.isPasswordVerified = isPasswordVerified;
     }
 }
