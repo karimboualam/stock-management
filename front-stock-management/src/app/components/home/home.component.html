@@ -1,14 +1,24 @@
-<div class="container">
-    <div class="row vh-100 align-items-center">
-      <div class="col-md-6">
-        <div class="card p-4 shadow-lg text-center">
-          <h2>Bienvenue sur Front Management Stock</h2>
-          <img src="assets/photos/logo.png" alt="Logo Application" class="img-fluid mt-3" />
-        </div>
+<div class="container vh-100 d-flex align-items-center">
+  <div class="row w-100">
+    <!-- Left section: Card containing the logo image -->
+    <div class="col-md-6">
+      <div class="card shadow-lg h-100">
+        <img
+          src="assets/photos/logo.png"
+          class="card-img-top"
+          alt="Application Logo"
+        />
       </div>
-      <div class="col-md-6">
-        <router-outlet></router-outlet>
+    </div>
+
+    <!-- Right section: Card containing the login form -->
+    <div class="col-md-6 d-flex justify-content-center align-items-center">
+      <div class="card shadow-lg w-75">
+        <div class="card-body">
+          <!-- Content of the Login component (form) -->
+          <router-outlet></router-outlet>
+        </div>
       </div>
     </div>
   </div>
-  
+</div>

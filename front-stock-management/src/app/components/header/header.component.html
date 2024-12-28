@@ -1,0 +1,29 @@
+<header>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+      <!-- Application logo on the left -->
+      <a class="navbar-brand" href="/menu">
+        <img src="assets/photos/icon-management.png" alt="Logo" style="height: 40px;">
+      </a>
+
+      <!-- Application name in the center -->
+      <span class="navbar-text mx-auto">
+        Stock Management
+      </span>
+
+      <!-- On the right: Greeting with First Name + Last Name and dropdown for user options -->
+      <div class="dropdown" *ngIf="firstName && lastName">
+        <button class="btn btn-link dropdown-toggle" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+          Bonjour, {{ firstName }} {{ lastName }}
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+          <!-- Navigation options using RouterLink -->
+          <li><a class="dropdown-item" [routerLink]="'/profil'">Profile</a></li>
+          <li><a class="dropdown-item" [routerLink]="'/parametres'">Settings</a></li>
+          <li><a class="dropdown-item" [routerLink]="'/historique'">History</a></li>
+          <li><a class="dropdown-item" (click)="logout()">Logout</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</header>

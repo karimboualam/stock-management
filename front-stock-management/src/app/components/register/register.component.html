@@ -1,26 +1,134 @@
 <div class="card p-4 shadow-lg">
-    <h3 class="text-center">Inscription</h3>
-    <form>
-      <div class="mb-3">
-        <label for="email" class="form-label">Email</label>
-        <input type="email" id="email" class="form-control" [(ngModel)]="email" name="email" required />
-      </div>
-      <div class="mb-3">
-        <label for="password" class="form-label">Mot de passe</label>
-        <input type="password" id="password" class="form-control" [(ngModel)]="password" name="password" required />
-      </div>
-      <div class="mb-3">
-        <label for="role" class="form-label">Rôle</label>
-        <select id="role" class="form-select" [(ngModel)]="role" name="role" required>
-          <option value="" disabled selected>Choisir un rôle</option>
-          <option value="ADMIN">ADMIN</option>
-          <option value="USER">USER</option>
-        </select>
-      </div>
-      <button class="btn btn-primary w-100" (click)="register()">S'inscrire</button>
-    </form>
-    <div class="text-center mt-3">
-      <a routerLink="/login">Se connecter</a>
+  <h3 class="text-center">Sign Up</h3> <!-- Title of the sign-up form -->
+  <form (ngSubmit)="register()">
+    <!-- Email Field -->
+    <div class="mb-3">
+      <label for="email" class="form-label">Email</label>
+      <input
+        type="email"
+        id="email"
+        class="form-control"
+        [(ngModel)]="email"
+        name="email"
+        required
+      />
     </div>
+
+    <!-- Password Field -->
+    <div class="mb-3">
+      <label for="password" class="form-label">Password</label>
+      <input
+        type="password"
+        id="password"
+        class="form-control"
+        [(ngModel)]="password"
+        name="password"
+        required
+      />
+    </div>
+
+    <!-- Confirm Password Field -->
+    <div class="mb-3">
+      <label for="confirmPassword" class="form-label">Confirm Password</label>
+      <input
+        type="password"
+        id="confirmPassword"
+        class="form-control"
+        [(ngModel)]="confirmPassword"
+        name="confirmPassword"
+        required
+      />
+    </div>
+
+    <!-- Error message if passwords don't match -->
+    <div *ngIf="password && confirmPassword && password !== confirmPassword" class="alert alert-danger">
+      Passwords do not match.
+    </div>
+
+    <!-- Last Name Field -->
+    <div class="mb-3">
+      <label for="lastName" class="form-label">Last Name</label>
+      <input
+        type="text"
+        id="lastName"
+        class="form-control"
+        [(ngModel)]="lastName"
+        name="lastName"
+        required
+      />
+    </div>
+
+    <!-- First Name Field -->
+    <div class="mb-3">
+      <label for="firstName" class="form-label">First Name</label>
+      <input
+        type="text"
+        id="firstName"
+        class="form-control"
+        [(ngModel)]="firstName"
+        name="firstName"
+        required
+      />
+    </div>
+
+    <!-- Gender Selection -->
+    <div class="mb-3">
+      <label for="gender" class="form-label">Gender</label><br />
+      <label>
+        <input
+          type="radio"
+          id="masculin"
+          name="gender"
+          [(ngModel)]="gender"
+          value="masculin"
+          required
+        />
+        Male
+      </label>
+      <label class="ms-3">
+        <input
+          type="radio"
+          id="feminin"
+          name="gender"
+          [(ngModel)]="gender"
+          value="feminin"
+          required
+        />
+        Female
+      </label>
+    </div>
+
+    <!-- Role Selection -->
+    <div class="mb-3">
+      <label for="role" class="form-label">Role</label>
+      <select
+        id="role"
+        class="form-select"
+        [(ngModel)]="role"
+        name="role"
+        required
+      >
+        <option value="" disabled selected>Select a role</option>
+        <option value="ADMIN">Admin</option>
+        <option value="USER">User</option>
+      </select>
+    </div>
+
+    <!-- Submit Button for Sign Up -->
+    <button type="submit" class="btn btn-primary w-100" [disabled]="password !== confirmPassword">Sign Up</button>
+  </form>
+
+  <!-- Success or Error Messages -->
+  <div *ngIf="successMessage" class="alert alert-success mt-3">{{ successMessage }}</div>
+  <div *ngIf="errorMessage" class="alert alert-danger mt-3">{{ errorMessage }}</div>
+
+  <!-- Link to the login page -->
+  <div class="text-center mt-3">
+    <a routerLink="/login">Already have an account? Log in</a>
   </div>
-  
+
+  <!-- Link for forgotten password -->
+  <div class="text-center mt-3">
+    <a routerLink="/forgot-password">Forgot password?</a>
+  </div>
+</div>

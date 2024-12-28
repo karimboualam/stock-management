@@ -1,39 +1,71 @@
 import { Component } from '@angular/core';
-//import { AuthService } from '../services/auth.service';
-import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { CommonModule } from '@angular/common'; // Import CommonModule for common Angular directives
+import { HttpClientModule } from '@angular/common/http'; // Import HttpClientModule for HTTP requests
 
 @Component({
   selector: 'app-register',
-  standalone: true,  // Indique que ce composant est autonome
+  standalone: true,
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css'],
-  imports: [FormsModule, RouterModule],  // Déclarez les modules nécessaires
+  imports: [FormsModule, RouterModule, CommonModule, HttpClientModule], // Import necessary modules
 })
 export class RegisterComponent {
+  // Declare variables for form fields
   email: string = '';
   password: string = '';
-  //role: string = 'USER';  // Par défaut 'USER'
+  confirmPassword: string = '';
   role: string = '';
-  errorMessage: string = '';  // Variable pour afficher les messages d'erreur
-  successMessage: string = '';  // Variable pour afficher un message de succès
-
+  gender: string = '';
+  lastName: string = '';
+  firstName: string = '';
+  successMessage: string = '';
+  errorMessage: string = '';
 
   constructor(private authService: AuthService, private router: Router) {}
 
+  // The register function that is triggered when the form is submitted
   register() {
-    const user = { email: this.email, password: this.password, role: this.role };
+    // Client-side validation for passwords match
+    if (this.password !== this.confirmPassword) {
+      this.errorMessage = "Passwords do not match."; // Display error if passwords don't match
+      this.successMessage = '';
+      return; // Exit function if passwords don't match
+    }
+
+    // Prepare the user object to send to the backend
+    const user = {
+      email: this.email,
+      password: this.password,
+      confirmPassword: this.confirmPassword, // Send confirmPassword for backend validation if necessary
+      role: this.role,
+      gender: this.gender,
+      lastName: this.lastName,
+      firstName: this.firstName,
+    };
+
+    // Call the register method from AuthService to make the HTTP request
     this.authService.register(user).subscribe(
-      (response) => {
-        this.successMessage = 'Utilisateur enregistré avec succès!';
-        this.errorMessage = ''; // Réinitialiser les messages d'erreur
-        console.log(response);  // Afficher la réponse dans la console
+      (response: any) => {
+        // Handle the response if registration is successful
+        if (response && response.message) {
+          this.successMessage = response.message; // Show success message
+          this.errorMessage = ''; // Clear any error message
+          console.log('Success:', response.message);
+          // Redirect to the login page after successful registration
+          this.router.navigate(['/login']);
+        } else {
+          this.errorMessage = 'Error: Unexpected server response.'; // Handle unexpected server response
+          this.successMessage = '';
+        }
       },
       (error) => {
-        this.errorMessage = 'Erreur d\'inscription: ' + (error.error.message || error.message);
-        this.successMessage = ''; // Réinitialiser les messages de succès
-        console.error(error);  // Afficher l'erreur dans la console
+        // Handle error in case of a failed registration request
+        console.error('Registration error:', error);
+        this.errorMessage = error.error?.message || 'Unknown error.'; // Display error message
+        this.successMessage = '';
       }
     );
   }
