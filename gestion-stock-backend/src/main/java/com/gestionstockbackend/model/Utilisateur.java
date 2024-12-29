@@ -2,9 +2,9 @@ package com.gestionstockbackend.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
+//import lombok.Data;
 
-@Data
+//@Data
 @Entity
 public class Utilisateur {
 

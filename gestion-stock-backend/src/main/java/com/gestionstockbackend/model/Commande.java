@@ -1,7 +1,7 @@
 package com.gestionstockbackend.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
+//import lombok.Data;
 
 import java.util.Date;
 import java.util.List;
