@@ -1,47 +1,46 @@
 version: '3.8'
 
 services:
-  # Service Backend - Spring Boot
   backend:
     build:
-      context: ./gestion-stock-backend  # Chemin vers le dossier backend
-      dockerfile: Dockerfile  # Nom du fichier Dockerfile pour le backend
+      context: ./gestion-stock-backend
     ports:
-      - "8080:8080"  # Exposer le port 8080 pour l'application Spring Boot
+      - "8080:8080"
     environment:
-      - SPRING_PROFILES_ACTIVE=prod  # Profil de Spring Boot (optionnel, dépend de votre configuration Spring)
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/gestion_stock
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
     depends_on:
-      - db  # Le backend dépend du service de base de données MySQL
+      - db
+    networks:
+      - backend_network
+    restart: always
 
-  # Service Frontend - Angular
   frontend:
     build:
-      context: ./front-stock-management  # Chemin vers le dossier frontend
-      dockerfile: Dockerfile  # Nom du fichier Dockerfile pour le frontend
+      context: ./front-stock-management
     ports:
-      - "80:80"  # Exposer le port 80 pour l'application Angular
-    depends_on:
-      - backend  # Le frontend dépend du backend pour l'API
+      - "80:80"
+    networks:
+      - backend_network
+    restart: always
 
-  # Service Base de données - MySQL
   db:
-    image: mysql:8.0  # Utiliser l'image officielle de MySQL
+    image: mysql:8.0
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword  # Définir le mot de passe root
-      MYSQL_DATABASE: gestion_stock  # Nom de la base de données
-      MYSQL_USER: root  # Nom de l'utilisateur MySQL
-      MYSQL_PASSWORD: rootpassword  # Mot de passe pour l'utilisateur
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: gestion_stock
     ports:
-      - "3306:3306"  # Exposer le port 3306 pour la base de données
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - backend_network
+    restart: always
 
-  # Service PHPMyAdmin (facultatif, pour gérer MySQL via une interface web)
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin
-    ports:
-      - "8081:80"  # Exposer le port 8081 pour accéder à PHPMyAdmin
-    environment:
-      - PMA_HOST=db  # Nom du service de base de données
-      - PMA_USER=root  # Utilisateur de la base de données (root dans ce cas)
-      - PMA_PASSWORD=rootpassword  # Mot de passe de l'utilisateur
-    depends_on:
-      - db  # PHPMyAdmin dépend de la base de données
+volumes:
+  mysql-data:
+
+networks:
+  backend_network:
+    driver: bridge
