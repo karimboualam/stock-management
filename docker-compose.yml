@@ -5,11 +5,13 @@ services:
     build:
       context: ./gestion-stock-backend
     ports:
-      - "8080:8080"
+      - "8080:8080"  # Expose le port 8080 du backend pour l'accès
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/gestion_stock
+      # Variables d'environnement pour la connexion à la base de données
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/gestion_stock?createDatabaseIfNotExist=true
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=root
+      - SPRING_APPLICATION_NAME=gestion-stock-backend
     depends_on:
       - db
     networks:
@@ -20,7 +22,7 @@ services:
     build:
       context: ./front-stock-management
     ports:
-      - "80:80"
+      - "4200:4200"  # Assure-toi que le frontend est accessible via le port 4200
     networks:
       - backend_network
     restart: always
@@ -31,16 +33,16 @@ services:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: gestion_stock
     ports:
-      - "3306:3306"
+      - "3306:3306"  # Expose le port 3306 pour accéder à la base de données en externe
     volumes:
-      - mysql-data:/var/lib/mysql
+      - mysql-data:/var/lib/mysql  # Persiste les données dans un volume
     networks:
       - backend_network
     restart: always
 
 volumes:
-  mysql-data:
+  mysql-data:  # Le volume pour la persistance des données MySQL
 
 networks:
   backend_network:
-    driver: bridge
+    driver: bridge  # Crée un réseau pour permettre la communication entre les conteneurs
