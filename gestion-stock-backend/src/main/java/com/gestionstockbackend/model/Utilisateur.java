@@ -31,6 +31,10 @@ public class Utilisateur {
     @Column(nullable = false, length = 255)
     private String gender = "unknown"; // Valeur par défaut pour éviter les conflits
 
+  //  @OneToMany(mappedBy = "utilisateur")
+  //  private List<Product> products;  // Liste des produits ajoutés par cet utilisateur
+
+
     // Suppression de l'attribut isEmailVerified
     // private boolean isEmailVerified = false;
 
@@ -38,6 +42,15 @@ public class Utilisateur {
     private boolean isPasswordVerified = false; // Indicateur pour vérifier si le mot de passe est confirmé
 
     // Getters & setters
+
+    // Getters & setters
+    /*public List<Product> getProducts() {
+        return products;
+    }
+
+    public void setProducts(List<Product> products) {
+        this.products = products;
+    }*/
 
     public Long getId() {
         return id;
