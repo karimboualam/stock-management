@@ -1,4 +1,8 @@
+const axios = require('axios');
 const Product = require('../models/Product');
+
+// Exemple d'URL du service Utilisateur (Spring Boot)
+const USER_SERVICE_URL = 'http://localhost:8080/api/utilisateurs';  // URL de l'API Spring Boot
 
 // Obtenir tous les produits
 exports.getAllProducts = async (req, res) => {
@@ -13,11 +17,32 @@ exports.getAllProducts = async (req, res) => {
 // Ajouter un produit
 exports.addProduct = async (req, res) => {
     try {
-        const product = new Product(req.body);
+        // Récupérer l'utilisateur actuel via l'ID de l'utilisateur (par exemple via JWT ou session)
+        const userId = req.user.id;
+
+        // Récupérer l'utilisateur depuis le service Utilisateur (Spring Boot)
+        const response = await axios.get(`${USER_SERVICE_URL}/${userId}`);
+        const user = response.data;
+
+        if (!user) {
+            return res.status(404).json({ message: 'Utilisateur non trouvé' });
+        }
+
+        // Créer un nouveau produit et l'associer à l'utilisateur récupéré
+        const product = new Product({
+            name: req.body.name,
+            price: req.body.price,
+            quantity: req.body.quantity,
+            description: req.body.description,
+            utilisateur: user // Utilisateur récupéré du service Spring Boot
+        });
+
+        // Sauvegarder le produit dans la base de données
         await product.save();
         res.status(201).json(product);
     } catch (err) {
-        res.status(400).json({ message: err.message });
+        console.error(err);
+        res.status(400).json({ message: 'Erreur lors de l\'ajout du produit' });
     }
 };
 
