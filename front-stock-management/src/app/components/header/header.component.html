@@ -27,3 +27,12 @@
     </div>
   </nav>
 </header>
+
+<div *ngIf="firstName && lastName; else errorTemplate">
+  <!-- Show user information -->
+  <p>Welcome, {{ firstName }} {{ lastName }}</p>
+</div>
+<ng-template #errorTemplate>
+  <!-- Fallback error message -->
+  <p>Error: User information not available. Please log in again.</p>
+</ng-template>

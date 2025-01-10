@@ -1,10 +1,9 @@
 package com.gestionstockbackend.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-//import lombok.Data;
 
-//@Data
 @Entity
 public class Utilisateur {
 
@@ -12,6 +11,7 @@ public class Utilisateur {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Email(message = "L'email doit être valide")
     @NotBlank(message = "L'email est obligatoire")
     private String email;
 
@@ -31,26 +31,15 @@ public class Utilisateur {
     @Column(nullable = false, length = 255)
     private String gender = "unknown"; // Valeur par défaut pour éviter les conflits
 
-  //  @OneToMany(mappedBy = "utilisateur")
-  //  private List<Product> products;  // Liste des produits ajoutés par cet utilisateur
-
-
-    // Suppression de l'attribut isEmailVerified
-    // private boolean isEmailVerified = false;
-
-    // Ajout de l'attribut isPasswordVerified
     private boolean isPasswordVerified = false; // Indicateur pour vérifier si le mot de passe est confirmé
 
-    // Getters & setters
+  //  public static final String ROLE_USER = "USER";
+   // public static final String ROLE_ADMIN = "ADMIN";
+    //public static final String ROLE_MANAGER = "MANAGER";
+    public static final String ROLE_USER = "ROLE_USER";
+    public static final String ROLE_ADMIN = "ROLE_ADMIN";
+    public static final String ROLE_MANAGER = "ROLE_MANAGER";
 
-    // Getters & setters
-    /*public List<Product> getProducts() {
-        return products;
-    }
-
-    public void setProducts(List<Product> products) {
-        this.products = products;
-    }*/
 
     public Long getId() {
         return id;
@@ -116,9 +105,18 @@ public class Utilisateur {
         isPasswordVerified = passwordVerified;
     }
 
-    // Constructeurs
-
     public Utilisateur() {
+    }
+
+    public Utilisateur(Long id, String email, String password, String role, String lastName, String firstName, String gender) {
+        this.id = id;
+        this.email = email;
+        this.password = password;
+        this.role = role;
+        this.lastName = lastName;
+        this.firstName = firstName;
+        this.gender = gender;
+        this.isPasswordVerified = false;  // Valeur par défaut
     }
 
     public Utilisateur(Long id, String email, String password, String role, String lastName, String firstName, String gender, boolean isPasswordVerified) {
