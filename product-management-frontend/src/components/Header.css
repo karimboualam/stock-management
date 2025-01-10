@@ -1,0 +1,13 @@
+/* Par exemple, ajuster le logo */
+.navbar-brand img {
+  height: 40px;
+}
+
+/* Optionnel : personnaliser le texte ou le bouton dropdown */
+.navbar-text {
+  font-size: 1.25rem;
+}
+
+.dropdown-toggle {
+  font-size: 1rem;
+}

@@ -12,6 +12,8 @@ public class UtilisateurController {
     @Autowired
     private UtilisateurRepository utilisateurRepository;
 
+    // Autoriser l'accès depuis React/Node.js (ajuster les URL si nécessaire)
+    @CrossOrigin(origins = "http://localhost:5000")
     // Récupérer un utilisateur par son ID
     @GetMapping("/{id}")
     public Utilisateur getUtilisateurById(@PathVariable Long id) {

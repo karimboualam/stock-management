@@ -1,4 +1,5 @@
 const express = require('express');
+const cookieParser = require('cookie-parser');  // Import cookie-parser
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const cors = require('cors'); // Importer le module CORS
@@ -14,9 +15,12 @@ const corsOptions = {
     origin: 'http://localhost:3000', // Frontend React
     methods: ['GET', 'POST', 'PUT', 'DELETE'], // Méthodes autorisées
     allowedHeaders: ['Content-Type', 'Authorization'], // En-têtes autorisés
+    credentials: true,  // Allow cookies in CORS requests
+    optionsSuccessStatus: 200, // Pour les requêtes OPTIONS
   };
 
 // Utiliser CORS avec les options définies
+app.use(cookieParser());  // Add cookie-parser middleware
 app.use(cors(corsOptions));
 
 // Middleware
@@ -24,7 +28,8 @@ app.use(express.json()); // Pour analyser les JSON des requêtes
 
 // Connecter à MongoDB
 mongoose
-    .connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+   // .connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+    .connect(process.env.MONGO_URI, { serverSelectionTimeoutMS: 5000 }) // Supprimez les options obsolètes
     .then(() => console.log('MongoDB connected'))
     .catch(err => console.log(err));
 

@@ -1,0 +1,24 @@
+/* Changer la couleur des liens actifs */
+.navbar .nav-link.active {
+    color: #ff8c00;  /* Couleur d'orange pour le lien actif */
+    font-weight: bold;
+  }
+  
+  /* Ajouter un léger effet de survol sur les liens */
+  .navbar .nav-link:hover {
+    color: #ff8c00;
+    text-decoration: underline;
+  }
+  
+  /* Si vous voulez un logo plus grand */
+  .navbar-brand img {
+    height: 45px;
+  }
+  
+  /* Ajuster l'espacement des éléments du menu sur mobile */
+  @media (max-width: 991px) {
+    .navbar-nav {
+      margin-top: 10px;
+    }
+  }
+  

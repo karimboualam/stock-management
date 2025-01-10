@@ -3,6 +3,8 @@ package com.gestionstockbackend.controller;
 import com.gestionstockbackend.model.Utilisateur;
 import com.gestionstockbackend.repository.UtilisateurRepository;
 import com.gestionstockbackend.service.JwtService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,8 +14,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import org.springframework.web.bind.annotation.CrossOrigin;
+
+
+import java.util.HashMap;
 import java.util.Map;
 
+@CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -40,6 +47,11 @@ public class AuthController {
             return new ResponseEntity<>("Passwords do not match", HttpStatus.BAD_REQUEST);
         }
 
+        // Valider le rôle
+        String role = payload.get("role").toUpperCase();
+        if (!role.equals("USER") && !role.equals("ADMIN") && !role.equals("MANAGER")&& !role.equals("ROLE_MANAGER")) {
+            return new ResponseEntity<>("Invalid role specified", HttpStatus.BAD_REQUEST);
+        }
         // Créer un nouvel utilisateur
         Utilisateur utilisateur = new Utilisateur();
         utilisateur.setEmail(payload.get("email"));  // L'email est pris tel quel sans validation
@@ -58,29 +70,33 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-   // public ResponseEntity<String> login(@RequestBody Utilisateur utilisateur) {
-        public ResponseEntity<Map<String, Object>> login(@RequestBody Utilisateur utilisateur) {
-
-            Utilisateur user = utilisateurRepository.findByEmail(utilisateur.getEmail())
+    public ResponseEntity<Map<String, String>> login(@RequestBody Utilisateur utilisateur, HttpServletResponse response) {
+        Utilisateur user = utilisateurRepository.findByEmail(utilisateur.getEmail())
                 .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
 
         if (passwordEncoder.matches(utilisateur.getPassword(), user.getPassword())) {
-            // Retourner le token JWT
-          //  return ResponseEntity.ok(jwtService.generateToken(user.getEmail()));
-            // Générer le token JWT avec firstName et lastName
             String token = jwtService.generateToken(user);
-            // Construire la réponse avec le token, firstName et lastName
 
+            Cookie cookie = new Cookie("token", token);
+            cookie.setHttpOnly(true);
+            cookie.setSecure(false);
+            cookie.setPath("/");
+            cookie.setDomain("localhost");
+            cookie.setMaxAge(60 * 60 * 24);
 
-            Map<String, Object> response = Map.of(
-                    "token", token,
-                    "firstName", user.getFirstName(),
-                    "lastName", user.getLastName()
-            );
+          //  response.addHeader("Set-Cookie", String.format("token=%s; HttpOnly; Secure; Path=/; Domain=localhost; Max-Age=%d; SameSite=None", token, 60 * 60 * 24));
+          //  response.addHeader("Set-Cookie", String.format("token=%s; HttpOnly; Path=/; Domain=localhost; Max-Age=%d; SameSite=Lax", token, 60 * 60 * 24));
+            response.addHeader("Set-Cookie", String.format("token=%s; HttpOnly; Secure; Path=/; Domain=localhost; Max-Age=%d; SameSite=None", token, 60 * 60 * 24));
+            response.addCookie(cookie);
 
-            return ResponseEntity.ok(response);
-        } else {
-            throw new RuntimeException("Mot de passe incorrect");
+            Map<String, String> responseBody = new HashMap<>();
+            responseBody.put("token", token);
+            responseBody.put("firstName", user.getFirstName());
+            responseBody.put("lastName", user.getLastName());
+            responseBody.put("userId", user.getId().toString());
+
+            return ResponseEntity.ok(responseBody);
         }
+        throw new RuntimeException("Mot de passe incorrect");
     }
 }

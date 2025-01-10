@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { getProduct } from '../api';
 import { useParams, useNavigate } from 'react-router-dom';
+import Cookies from 'js-cookie';  // Importer la bibliothèque js-cookie
 
 const ProductDetails = () => {
     const { id } = useParams();
@@ -10,7 +11,16 @@ const ProductDetails = () => {
 
     useEffect(() => {
         const fetchProduct = async () => {
-            const token = localStorage.getItem('token');
+            // Récupérer le token depuis les cookies
+            const token = Cookies.get('token');
+            
+            if (!token) {
+                // Si le token n'est pas présent, rediriger vers la page de login
+                console.error('Token manquant');
+                navigate('/login');
+                return;
+            }
+
             try {
                 const fetchedProduct = await getProduct(id, token);
                 setProduct(fetchedProduct);
@@ -22,7 +32,7 @@ const ProductDetails = () => {
         };
 
         fetchProduct();
-    }, [id]);
+    }, [id, navigate]);
 
     if (loading) {
         return <div>Chargement...</div>;
