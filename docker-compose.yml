@@ -1,13 +1,13 @@
 version: '3.8'
 
 services:
+  # Service Java Spring Boot
   backend:
     build:
-      context: ./gestion-stock-backend
+      context: ./product-management-backend
     ports:
-      - "8080:8080"  # Expose le port 8080 du backend pour l'accès
+      - "8080:8080"
     environment:
-      # Variables d'environnement pour la connexion à la base de données
       - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/gestion_stock?createDatabaseIfNotExist=true
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=root
@@ -18,31 +18,64 @@ services:
       - backend_network
     restart: always
 
+  # Service Angular
   frontend:
     build:
       context: ./front-stock-management
     ports:
-      - "4200:4200"  # Assure-toi que le frontend est accessible via le port 4200
+      - "4200:4200"
     networks:
       - backend_network
     restart: always
 
+  # Service React
+  react-frontend:
+    build:
+      context: ./product-management-frontend
+    ports:
+      - "3000:3000"
+    networks:
+      - backend_network
+    restart: always
+
+  # Service Node.js
+  nodejs-backend:
+    build:
+      context: ./gestion-stock-backend
+    ports:
+      - "5000:5000"
+    networks:
+      - backend_network
+    restart: always
+
+  # Service MySQL
   db:
     image: mysql:8.0
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: gestion_stock
     ports:
-      - "3306:3306"  # Expose le port 3306 pour accéder à la base de données en externe
+      - "3306:3306"
     volumes:
-      - mysql-data:/var/lib/mysql  # Persiste les données dans un volume
+      - mysql-data:/var/lib/mysql
+    networks:
+      - backend_network
+    restart: always
+
+  # Service phpMyAdmin
+  phpmyadmin:
+    image: phpmyadmin
+    environment:
+      PMA_HOST: db
+    ports:
+      - "8081:80"
     networks:
       - backend_network
     restart: always
 
 volumes:
-  mysql-data:  # Le volume pour la persistance des données MySQL
+  mysql-data:
 
 networks:
   backend_network:
-    driver: bridge  # Crée un réseau pour permettre la communication entre les conteneurs
+    driver: bridge
