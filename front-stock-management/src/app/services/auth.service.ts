@@ -9,7 +9,9 @@ import { CookieService } from 'ngx-cookie-service';
   providedIn: 'root'  // Makes this service available throughout the application
 })
 export class AuthService {
-  private baseUrl = 'http://localhost:8080/api/auth';  // The base URL for the backend authentication API
+//  private baseUrl = 'http://localhost:8080/api/auth';  // The base URL for the backend authentication API
+  private baseUrl = 'http://localhost:9091/api/auth';  // The base URL for the backend authentication API
+
 
   constructor(private http: HttpClient, private cookieService: CookieService) {}  // Injecting HttpClient service to make HTTP requests
 

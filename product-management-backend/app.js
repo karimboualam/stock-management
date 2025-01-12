@@ -12,7 +12,16 @@ const app = express();
 
 // Configurer CORS : Autoriser les requêtes de localhost:3000
 const corsOptions = {
-    origin: 'http://localhost:3000', // Frontend React
+ //   origin: ['http://localhost:3000', 'http://localhost:80'],// Frontend React
+  //  origin:  'http://localhost:*',// Frontend React
+
+    origin: (origin, callback) => {
+        if (!origin || origin === 'http://localhost:80' || origin === 'http://localhost') {
+            callback(null, true);
+        } else {
+            callback(new Error('CORS not allowed'), false);
+        }
+    },
     methods: ['GET', 'POST', 'PUT', 'DELETE'], // Méthodes autorisées
     allowedHeaders: ['Content-Type', 'Authorization'], // En-têtes autorisés
     credentials: true,  // Allow cookies in CORS requests
@@ -31,7 +40,10 @@ mongoose
    // .connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
     .connect(process.env.MONGO_URI, { serverSelectionTimeoutMS: 5000 }) // Supprimez les options obsolètes
     .then(() => console.log('MongoDB connected'))
-    .catch(err => console.log(err));
+//    .catch(err => console.log(err));
+    .catch(err => {
+        console.error('Failed to connect to MongoDB', err.message);
+    });
 
     // Routes
 app.use('/api/products', productRoutes); // Montée en charge des routes produits
@@ -43,17 +55,17 @@ app.get('/', (req, res) => {
 
 
 
-
+/*
 mongoose
     .connect(process.env.MONGO_URI, {
         useNewUrlParser: true,
         useUnifiedTopology: true,
         serverSelectionTimeoutMS: 5000, // Délai d'attente pour MongoDB
-    })
+    }) 
     .then(() => console.log('MongoDB connected'))
     .catch(err => {
         console.error('Failed to connect to MongoDB', err.message);
-    });
+    }); */
 
 
 
