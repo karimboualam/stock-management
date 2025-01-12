@@ -3,9 +3,15 @@
 
 const axios = require('axios');
 const Product = require('../models/Product');
+require('dotenv').config();  // Charger les variables d'environnement depuis .env
+
 
 // Exemple d'URL du service Utilisateur (Spring Boot)
-const USER_SERVICE_URL = 'http://localhost:8080/api/utilisateurs';  // URL de l'API Spring Boot
+//const USER_SERVICE_URL = 'http://localhost:8080/api/utilisateurs';  // URL de l'API Spring Boot
+// const USER_SERVICE_URL = 'http://localhost:9091/api/utilisateurs';  // URL de l'API Spring Boot
+//const USER_SERVICE_URL = 'http://10.247.82.107:9091/api/utilisateurs';  // URL de l'API Spring Boot
+const USER_SERVICE_URL = process.env.SERVICE_URL;
+   
 
 // Obtenir tous les produits
 exports.getAllProducts = async (req, res) => {
@@ -21,11 +27,13 @@ exports.getAllProducts = async (req, res) => {
 
 // Ajouter un produit
 exports.addProduct = async (req, res) => {
-    console.log('REACT')
+    console.log('Controller - :  addProduct :')
     try {
         // Récupérer l'utilisateur actuel via l'ID de l'utilisateur (par exemple via JWT ou session)
-       console.log('REACT : req.user == ', req.userId);
+       console.log('Controller - NodeJS : req.user == ', req.userId);
+       console.log('Processing addProduct request...');
       //  const userId = req.user.id;
+    
         const userId = req.userId;
 
 
@@ -33,13 +41,25 @@ exports.addProduct = async (req, res) => {
             return res.status(400).json({ message: 'ID utilisateur manquant' });
         }
         console.log('1: User ID:', userId);  // Log de l'ID utilisateur pour le débogage
+        // Fetch user data from the Spring Boot service
+        try {
+            console.log('${USER_SERVICE_URL}/${userId} = ',`${USER_SERVICE_URL}/${userId}`);
+            const userResponse = await axios.get(`${USER_SERVICE_URL}/${userId}`);
+            console.log('Fetched User Data:', userResponse.data);
+        } catch (error) {
+            console.error('Error connecting to User Service:', error.message);
+            return res.status(500).json({ message: 'Unable to fetch user data from User Service' });
+        }
         // Récupérer l'utilisateur depuis le service Utilisateur (Spring Boot)
     //    const response = await axios.get(`${USER_SERVICE_URL}/${userId}`);
-    const response = await axios.get(`${USER_SERVICE_URL}/${userId}`, {
-        headers: {
-            Authorization: `Bearer ${req.headers.authorization.split(' ')[1]}`, // Extract token
-        },
-    });
+    // Fetch user data from the Spring Boot service
+   
+        const response = await axios.get(`${USER_SERVICE_URL}/${userId}`, {
+            headers: {
+                Authorization: `Bearer ${req.headers.authorization.split(' ')[1]}`, // Extract token
+            },
+        });
+    
     
         console.log('2: User ID:', userId);  // Log de l'ID utilisateur pour le débogage
 
@@ -67,6 +87,8 @@ exports.addProduct = async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(400).json({ message: 'Erreur lors de l\'ajout du produit',err });
+        res.status(500).json({ message: 'Internal server error' });
+
     }
 };
 

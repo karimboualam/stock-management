@@ -36,7 +36,7 @@ const Header = () => {
       <div className="container-fluid">
         {/* Logo de l'application */}
         <a className="navbar-brand" href="/menu">
-          <img src="assets/photos/icon-management.png" alt="Logo" style={{ height: '40px' }} />
+          <img src="assets/photos/logo.png" alt="Logo" style={{ height: '40px' }} />
         </a>
 
         {/* Nom de l'application au centre */}

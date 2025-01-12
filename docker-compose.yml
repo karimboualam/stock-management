@@ -4,10 +4,13 @@ services:
   # Service Java Spring Boot
   backend:
     build:
-      context: ./product-management-backend
+      context: ./gestion-stock-backend
     ports:
-      - "8080:8080"
+      #- "8080:8080"  # Expose le port 8080 du backend pour l'accès
+       - "9091:9091"
+
     environment:
+      # Variables d'environnement pour la connexion à la base de données
       - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/gestion_stock?createDatabaseIfNotExist=true
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=root
@@ -28,26 +31,6 @@ services:
       - backend_network
     restart: always
 
-  # Service React
-  react-frontend:
-    build:
-      context: ./product-management-frontend
-    ports:
-      - "3000:3000"
-    networks:
-      - backend_network
-    restart: always
-
-  # Service Node.js
-  nodejs-backend:
-    build:
-      context: ./gestion-stock-backend
-    ports:
-      - "5000:5000"
-    networks:
-      - backend_network
-    restart: always
-
   # Service MySQL
   db:
     image: mysql:8.0
@@ -55,11 +38,35 @@ services:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: gestion_stock
     ports:
-      - "3306:3306"
+      - "3306:3306"  # Expose le port 3306 pour accéder à la base de données en externe
     volumes:
-      - mysql-data:/var/lib/mysql
+      - mysql-data:/var/lib/mysql  # Persiste les données dans un volume
     networks:
       - backend_network
+    restart: always
+
+  # Service React
+  react-frontend:
+    build:
+      context: ./product-management-frontend
+    ports:
+    #- "4000:4000"
+      - "80:80"
+      # - "3000:3000"
+    networks:
+      - backend_network
+    restart: always
+
+  # Service Node.js
+  nodejs-backend:
+    build:
+      context: ./product-management-backend
+    ports:
+      - "5000:5000"
+    networks:
+      - backend_network
+    depends_on:
+    - backend  # Wait for the backend service to be ready
     restart: always
 
   # Service phpMyAdmin
@@ -74,7 +81,7 @@ services:
     restart: always
 
 volumes:
-  mysql-data:
+  mysql-data:  # Volume pour la persistance des données MySQL
 
 networks:
   backend_network:
