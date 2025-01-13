@@ -6,11 +6,8 @@ services:
     build:
       context: ./gestion-stock-backend
     ports:
-      #- "8080:8080"  # Expose le port 8080 du backend pour l'accès
-       - "9091:9091"
-
+      - "9091:9091"
     environment:
-      # Variables d'environnement pour la connexion à la base de données
       - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/gestion_stock?createDatabaseIfNotExist=true
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=root
@@ -38,9 +35,9 @@ services:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: gestion_stock
     ports:
-      - "3306:3306"  # Expose le port 3306 pour accéder à la base de données en externe
+      - "3306:3306"
     volumes:
-      - mysql-data:/var/lib/mysql  # Persiste les données dans un volume
+      - mysql-data:/var/lib/mysql
     networks:
       - backend_network
     restart: always
@@ -50,9 +47,7 @@ services:
     build:
       context: ./product-management-frontend
     ports:
-    #- "4000:4000"
       - "80:80"
-      # - "3000:3000"
     networks:
       - backend_network
     restart: always
@@ -66,7 +61,7 @@ services:
     networks:
       - backend_network
     depends_on:
-    - backend  # Wait for the backend service to be ready
+      - backend
     restart: always
 
   # Service phpMyAdmin
@@ -80,8 +75,44 @@ services:
       - backend_network
     restart: always
 
+  # Service PostgreSQL pour Kong (remplacé par l'image officielle PostgreSQL)
+  kong-database:
+    image: postgres:13 # Utilisation de l'image officielle PostgreSQL
+    container_name: kong-database
+    environment:
+      - POSTGRES_USER=kong
+      - POSTGRES_DB=kong
+      - POSTGRES_PASSWORD=kong
+    ports:
+      - "5432:5432"
+    restart: always
+    networks:
+      - backend_network
+
+  # Service Kong (API Gateway)
+  kong:
+    image: kong:latest
+    container_name: kong
+    environment:
+      - KONG_DATABASE=postgres
+      - KONG_PG_HOST=kong-database
+      - KONG_PG_PASSWORD=kong
+      - KONG_PROXY_ACCESS_LOG=/dev/stdout
+      - KONG_PROXY_ERROR_LOG=/dev/stderr
+      - KONG_ADMIN_ACCESS_LOG=/dev/stdout
+      - KONG_ADMIN_ERROR_LOG=/dev/stderr
+      - KONG_ADMIN_LISTEN=0.0.0.0:8001
+    ports:
+      - "8000:8000"   # Port HTTP pour accéder au gateway
+      - "8443:8443"   # Port HTTPS pour accéder au gateway
+    depends_on:
+      - kong-database
+    networks:
+      - backend_network
+    restart: always
+
 volumes:
-  mysql-data:  # Volume pour la persistance des données MySQL
+  mysql-data:  # Volume pour persister les données MySQL
 
 networks:
   backend_network:
